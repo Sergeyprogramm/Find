@@ -1,4 +1,3 @@
-import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,8 +5,11 @@ import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+
+import static org.junit.Assert.*;
+
 /**
- * Created by 1081_1 on 16.05.17.
+ * Created by Александр on 11.05.2017.
  */
 public class MainTest {
     String filename = "";
@@ -41,16 +43,21 @@ public class MainTest {
     }
 
     public void deleteDir(String dir) throws Exception {
-
         try {
             File file = new File(dir);
             Path fp = file.toPath();
+            String[] entries = file.list();
+            for (String s : entries) {
+                File currentFile = new File(file.getPath(), s);
+                currentFile.delete();
+            }
             Files.delete(fp);
+            System.out.println("Directory is removed!");
         } catch (NoSuchFileException x) {
             System.err.format("%s: no such" + " file or directory%n", dir);
         } catch (DirectoryNotEmptyException x) {
             System.err.format("%s not empty%n", dir);
-        } catch (IOException x) {// File permission problems are caught here.
+        } catch (IOException x) {
             System.err.println(x);
         }
     }
@@ -72,21 +79,26 @@ public class MainTest {
     @org.junit.Before
     public void setUp() throws Exception {
         filename = "target.txt";
-        dir = "C:\\Users\\Александр\\Desktop\\";
+        dir = "C:\\Users\\Сергей\\Desktop\\";
         dirs = new String[]
                 {
-                        "C:\\Users\\Александр\\Desktop\\N1",
-                        "C:\\Users\\Александр\\Desktop\\N2",
-                        "C:\\Users\\Александр\\Desktop\\N3",
-                        "C:\\Users\\Александр\\Desktop\\N4"
+                        "C:\\Users\\Сергей\\Desktop\\N1",
+                        "C:\\Users\\Сергей\\Desktop\\N2",
+                        "C:\\Users\\Сергей\\Desktop\\N3",
+                        "C:\\Users\\Сергей\\Desktop\\N4"
                 };
     }
 
     @org.junit.After
     public void exit() throws Exception {
         for (int i = 0; i < dirs.length; i++) {
-            deleteDir(dirs[i]);
+            File file = new File(dirs[i]);
+            if (file.exists())
+                deleteDir(dirs[i]);
         }
+        File file = new File(dir + filename);
+        if (file.exists())
+            deleteFile(dir, filename);
     }
 
     @org.junit.Test
@@ -95,15 +107,18 @@ public class MainTest {
             createDir(dirs[i]);
             createFile(dirs[i], filename);
             org.junit.Assert.assertEquals(Main.SearchInFolder(dirs[i], filename, false).found, true);
-            //deleteFile(dirs[i],filename);
-            //deleteDir(dirs[i]);
         }
     }
 
     @org.junit.Test
     public void find() throws Exception {
-
+        org.junit.Assert.assertEquals(Main.Find(new String[]{"target.txt"}).Print(), "Файл не найден");
+        createFile(dir, filename);
+        org.junit.Assert.assertEquals(Main.Find(new String[]{"-d", "C:\\Users\\Сергей\\Desktop", "target.txt"}).Print(), "Файл найден: C:\\Users\\Сергей\\Desktop");
+        deleteFile(dir,filename);
+        createDir(dirs[0]);
+        createFile(dirs[0], filename);
+        org.junit.Assert.assertEquals(Main.Find(new String[]{"-r", "-d", "C:\\Users\\Сергей\\Desktop", "target.txt"}).Print(), "Файл найден: C:\\Users\\Сергей\\Desktop\\N1");
     }
-
 
 }

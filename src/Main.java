@@ -1,11 +1,20 @@
 
+
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+
+
+
+import static org.junit.Assert.*;
+
 /**
  * Created by 1081_1 on 16.05.17.
  */
+
+
+
 public class Main {
     static public SearchResult SearchInFolder(String dir, String filename, boolean searchInSubFolders) {
         File folder = new File(dir);
@@ -46,6 +55,6 @@ public class Main {
 
 
     public static void main(String[] args) {
-        System.out.print(Find(new String[]{"target.txt"}).Print());
+        System.out.print(Find(args).Print());
     }
 }
